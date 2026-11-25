@@ -137,31 +137,44 @@ engine directly — there is no API server, login, or network request.
 
 ---
 
-## Android APK
+## Phone builds (APK & IPA)
 
-The APK is built by GitHub Actions and attached as a workflow artifact.
-Every push to `main` (or a manual `workflow_dispatch`) produces a debug APK;
-publishing a GitHub Release also attaches the APK to that release.
+Every push to `main` builds both apps in GitHub Actions and updates the
+rolling **mobile-latest** prerelease, so these links always point at the newest
+`main` build:
 
-**Download it:** open the latest **Android APK** workflow run → **Artifacts** →
-`tastechef-debug-apk`. Unzip and install `TasteChef-*-debug.apk` (enable
-"Install unknown apps" for your browser or file manager).
+- **Android APK:** https://github.com/mickeykera/taste_chef/releases/download/mobile-latest/TasteChef-debug.apk
+- **iOS IPA (unsigned):** https://github.com/mickeykera/taste_chef/releases/download/mobile-latest/TasteChef-unsigned.ipa
 
-**Build locally** (requires JDK 21 and Android SDK 35):
+The same files are available in the **Mobile builds** workflow run under
+**Artifacts** (`tastechef-apk`, `tastechef-ipa`). Publishing a GitHub Release
+also attaches both files to that release.
+
+**Android:** open the APK on the phone and allow "Install unknown apps" when
+asked. It is signed with the standard Android debug key — fine for testing, not
+for the Play Store.
+
+**iPhone / iPad:** iOS will not install an unsigned IPA by tapping it. Sideload
+it with AltStore, Sideloadly or Xcode. A free Apple ID works and signs the app
+for 7 days; a paid developer account signs it for a year.
+
+**Build locally:**
 
 ```bash
 pnpm install
+
+# Android (JDK 21 + Android SDK 35)
 pnpm apk
 # → apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+
+# iOS (macOS + Xcode + CocoaPods)
+pnpm --filter @tastechef/mobile ios:ipa
+# → apps/mobile/artifacts/TasteChef-unsigned.ipa
 ```
 
 `pnpm apk` runs the Vite build, `cap sync android`, and `./gradlew assembleDebug`.
-The generated `apps/mobile/android/` project is committed, so CI only needs the
-SDK, JDK, and a Gradle build.
-
-> The debug APK is self-signed with the standard Android debug key. It is fine
-> for sideloading and testing. For Play Store distribution, add a release
-> keystore and a `bundleRelease`/`assembleRelease` step to the workflow.
+The `apps/mobile/android/` and `apps/mobile/ios/` projects are committed, so CI
+only needs the SDK/JDK/Xcode and a build.
 
 ---
 

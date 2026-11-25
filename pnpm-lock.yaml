@@ -69,6 +69,9 @@ importers:
       '@capacitor/core':
         specifier: ^7.6.10
         version: 7.6.10
+      '@capacitor/ios':
+        specifier: ^7.6.10
+        version: 7.6.10(@capacitor/core@7.6.10)
       '@tastechef/distilled-ai':
         specifier: workspace:*
         version: link:../../packages/distilled-ai
@@ -764,6 +767,11 @@ packages:
 
   '@capacitor/core@7.6.10':
     resolution: {integrity: sha512-foYHd//t6E3RTELVG8wdkp5jVnmLcHKUurAa9BA8EUSNd2eY0SijCHpfO0bFwYBP5DrCeXwgSFYi3NJw413gtQ==}
+
+  '@capacitor/ios@7.6.10':
+    resolution: {integrity: sha512-iDXt6n6+tQq6fLMgdVNwT7dtgyqGSpGmPx1AGrUJq3YxOqpzqqtY4v4phqhys9PxPSrVyxnWGAL+SEsAHtZLkQ==}
+    peerDependencies:
+      '@capacitor/core': ^7.6.0
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -5248,6 +5256,10 @@ snapshots:
   '@capacitor/core@7.6.10':
     dependencies:
       tslib: 2.9.1
+
+  '@capacitor/ios@7.6.10(@capacitor/core@7.6.10)':
+    dependencies:
+      '@capacitor/core': 7.6.10
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true

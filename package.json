@@ -10,7 +10,8 @@
     "dev:mobile": "pnpm --filter @tastechef/mobile dev",
     "build:mobile": "pnpm --filter @tastechef/mobile build",
     "android:sync": "pnpm --filter @tastechef/mobile cap:sync",
-    "apk": "pnpm --filter @tastechef/mobile android:apk"
+    "apk": "pnpm --filter @tastechef/mobile android:apk",
+    "ios:ipa": "pnpm --filter @tastechef/mobile ios:ipa"
   },
   "devDependencies": {
     "typescript": "^5.5.4"
