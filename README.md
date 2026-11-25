@@ -115,6 +115,7 @@ pnpm dev
 ```
 
 - **Web:** http://localhost:3002 (configured to port 3002 to avoid collision with standard port 3000)
+- **Landing page:** http://localhost:3002/landing (marketing page; Android APK download at `/downloads/tastechef-debug.apk`)
 - **API:** http://localhost:3001
 - **Mobile (browser):** http://localhost:5173
 - **Demo Mode:** Click **"🚀 Try Instant Demo"** on the landing page or login page for immediate zero-friction access without requiring Supabase or API keys.
