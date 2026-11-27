@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from 'next';
 import './landing.css';
 
 export const metadata: Metadata = {
-  title: 'TasteChef — Your pantry, in one app',
+  title: 'TasteChef — Cooking that respects what you will actually eat',
   description:
-    'Recipes from the pantry you have, matched to your diet, texture dislikes and taste. Generated offline on your phone.',
+    'Recipes built around your texture likes and dislikes, your allergens and the food already in your kitchen. Pre-launch preview.',
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fbfaf4',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,

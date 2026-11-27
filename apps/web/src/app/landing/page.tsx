@@ -2,531 +2,730 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-type Pane = 'cook' | 'pantry' | 'taste' | 'saved';
+const START_FREE = '/auth/login';
+const LOG_IN = '/auth/login?mode=login';
+const GITHUB = 'https://github.com/mickeykera/taste_chef';
+const EMAIL = 'mailto:hello@tastechef.app';
+const APK = '/downloads/tastechef-debug.apk';
+
+function Arrow({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 10h12M11 5l5 5-5 5" />
+    </svg>
+  );
+}
+
+function Check() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+      <path d="M4 10.5l4 4 8-9" />
+    </svg>
+  );
+}
+
+function Bowl() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3.5 11.5h17c0 4.7-3.8 8.5-8.5 8.5s-8.5-3.8-8.5-8.5Z" />
+      <path d="M8.5 8.2c-.6-1.2.4-2 .1-3.1M12 8.2c-.6-1.2.4-2 .1-3.1M15.5 8.2c-.6-1.2.4-2 .1-3.1" />
+    </svg>
+  );
+}
+
+function Stars() {
+  return (
+    <span className="stars" aria-hidden="true">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <svg key={i} className="empty" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 1.8l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8L10 1.8Z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
 
 export default function LandingPage() {
-  const burgerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activePane, setActivePane] = useState<Pane>('cook');
-  const [selected, setSelected] = useState(0);
-  const [generated, setGenerated] = useState(false);
+  const burgerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    if (!menuOpen) return;
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setMenuOpen(false);
         burgerRef.current?.focus();
       }
     };
+    const onDocClick = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (!target?.closest('.site-header')) setMenuOpen(false);
+    };
+    const onResize = () => {
+      if (window.innerWidth > 900) setMenuOpen(false);
+    };
+
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
+    document.addEventListener('click', onDocClick);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('click', onDocClick);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <>
-<svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-  <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></symbol>
-  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></symbol>
-  <symbol id="i-bowl" viewBox="0 0 32 32"><path d="M7.5 15.5h17a8.5 8.5 0 0 1-17 0Z" fill="currentColor"/><path d="M12 10.2c0-2.1 2.1-2.1 2.1-4.2M18 10.2c0-2.1 2.1-2.1 2.1-4.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></symbol>
-  <symbol id="i-cook" viewBox="0 0 24 24"><path d="M5 10h14v3a7 7 0 0 1-14 0v-3Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M9 6c0-1.6 1.5-1.6 1.5-3.2M14 6c0-1.6 1.5-1.6 1.5-3.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-pantry" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M4 9h16M8 13h8M8 17h5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-taste" viewBox="0 0 24 24"><path d="M12 3c2.4 3.4 5 5.8 5 9a5 5 0 0 1-10 0c0-3.2 2.6-5.6 5-9Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M9.4 12.6c0 1.9 1.4 3 2.6 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-saved" viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4V4Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6"/><path d="m15.5 15.5 4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></symbol>
-  <symbol id="i-check" viewBox="0 0 16 16"><path d="m3 8.5 3.2 3.2L13 4.8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.2" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M10.5 18.5h3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M9 21h6M12 17v4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-tablet" viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="2.2" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M10.5 18.5h3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></symbol>
-  <symbol id="i-signal-off" viewBox="0 0 24 24"><path d="M3 3 21 21" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><path d="M5 12.5a10 10 0 0 1 4-2.4M9 7.5a14 14 0 0 1 10 3.6M8 16.5a6 6 0 0 1 5-1.6M12 20h.01" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></symbol>
-  <symbol id="i-star" viewBox="0 0 16 16"><path d="m8 1.8 1.9 3.8 4.2.6-3 2.9.7 4.1L8 11.3l-3.8 2 .7-4.1-3-2.9 4.2-.6L8 1.8Z" fill="currentColor"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.4"/><path d="M8 4.8V8l2.2 1.4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></symbol>
-  <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.5"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></symbol>
-  <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="m10 9.2 4.5 2.8-4.5 2.8V9.2Z" fill="currentColor"/></symbol>
-  <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 2.5a9.5 9.5 0 0 0-3 18.5c.5.1.7-.2.7-.5v-1.8c-2.7.6-3.2-1.2-3.2-1.2-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.4-2.1-.2-4.4-1.1-4.4-4.8 0-1.1.4-1.9 1-2.6-.1-.2-.4-1.2.1-2.5 0 0 .8-.3 2.6 1a9 9 0 0 1 4.8 0c1.8-1.3 2.6-1 2.6-1 .5 1.3.2 2.3.1 2.5.6.7 1 1.5 1 2.6 0 3.7-2.3 4.6-4.4 4.8.3.3.6.9.6 1.8v2.7c0 .3.2.6.7.5A9.5 9.5 0 0 0 12 2.5Z" fill="currentColor"/></symbol>
-  <symbol id="i-leaf" viewBox="0 0 32 32"><path d="M26 6c-9 0-15 4-15 11 0 3 1.5 5 4 6 7-1 11-7 11-17Z" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M8 26c2-7 7-11 13-14" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></symbol>
-  <symbol id="i-pot" viewBox="0 0 32 32"><path d="M7 14h18v4a9 9 0 0 1-18 0v-4Z" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M4 15h3M25 15h3M12 9c0-1.5 1.5-1.5 1.5-3M18 9c0-1.5 1.5-1.5 1.5-3" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></symbol>
-</svg>
+    <div className="tc-landing" id="top">
+      <a className="skip" href="#main">Skip to content</a>
 
-<div className="tc-landing" id="top">
-  <a className="skip-link" href="#main">Skip to content</a>
-  <div className="announcement">
-    <div className="tc-container">
-      <span className="ann-chip">New</span>
-      <span className="ann-text ann-long">TasteChef now generates recipes fully offline</span>
-      <span className="ann-text ann-short">Fully offline recipes</span>
-      <a className="ann-link" href="#offline">See what’s new <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-    </div>
-  </div>
-
-  <div className="header-wrap">
-    <div className="tc-container">
-      <header className="header">
-        <a className="brand" href="#top" aria-label="TasteChef home">
-          <span className="brand-mark"><svg aria-hidden="true"><use href="#i-bowl"/></svg></span>
-          <span className="brand-word">TasteChef</span>
-        </a>
-        <nav className="nav" aria-label="Main">
-          <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
-          <a href="#taste" onClick={() => setMenuOpen(false)}>Taste</a>
-          <a href="#offline" onClick={() => setMenuOpen(false)}>Offline</a>
-          <a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a>
-        </nav>
-        <div className="header-actions">
-          <a className="login" href="/auth/login">Log in</a>
-          <a className="btn btn-primary btn-sm" href="/app/generate">Get the app <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <header className="site-header">
+        <div className="wrap header-inner">
+          <a className="brand" href="#top" aria-label="TasteChef home">
+            <span className="brand-mark"><Bowl /></span>
+            TasteChef
+          </a>
+          <nav className="nav" aria-label="Main">
+            <a href="#how">How it works</a>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+          <div className="header-actions">
+            <a className="login" href={LOG_IN}>Log in</a>
+            <a className="btn btn-primary btn-sm" href={START_FREE}>Start free</a>
+            <button
+              ref={burgerRef}
+              className="burger"
+              type="button"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <svg className="icon-menu" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <path d="M3 6h14M3 10h14M3 14h14" />
+              </svg>
+              <svg className="icon-close" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <path d="M5 5l10 10M15 5L5 15" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <button
-          className="burger"
-          type="button"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
-          ref={burgerRef}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <svg width="22" height="22" aria-hidden="true"><use href={menuOpen ? '#i-close' : '#i-menu'} /></svg>
-        </button>
+        <div className={`mobile-nav${menuOpen ? ' open' : ''}`} id="mobile-nav">
+          <a href="#how" onClick={closeMenu}>How it works <Arrow size={14} /></a>
+          <a href="#features" onClick={closeMenu}>Features <Arrow size={14} /></a>
+          <a href="#pricing" onClick={closeMenu}>Pricing <Arrow size={14} /></a>
+          <a href="#faq" onClick={closeMenu}>FAQ <Arrow size={14} /></a>
+          <div className="mobile-actions">
+            <a className="btn btn-secondary" href={LOG_IN}>Log in</a>
+            <a className="btn btn-primary" href={START_FREE}>Start free</a>
+          </div>
+        </div>
       </header>
-      <div className={menuOpen ? 'mobile-menu open' : 'mobile-menu'} id="mobile-menu">
-        <a href="#features" onClick={() => setMenuOpen(false)}>Features <svg width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <a href="#taste" onClick={() => setMenuOpen(false)}>Taste <svg width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <a href="#offline" onClick={() => setMenuOpen(false)}>Offline <svg width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <a href="#faq" onClick={() => setMenuOpen(false)}>FAQ <svg width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <div className="mm-actions">
-          <a className="btn btn-secondary" href="/auth/login">Log in</a>
-          <a className="btn btn-primary" href="/app/generate">Get the app</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div className="frame">
-    <main id="main" tabIndex={-1}>
-    <section className="section hero" id="hero">
-      <div className="tc-container">
-        <div className="hero-copy">
-          <div className="hero-eyebrow"><span className="hero-mark" aria-hidden="true"></span><span>Offline recipe AI</span></div>
-          <h1><span className="line">Your pantry,</span> <span className="line">in one app.</span></h1>
-          <p className="hero-lead">Recipes from the pantry you have — matched to your diet, texture dislikes and taste. Offline, on your phone.</p>
-          <div className="hero-actions">
-            <a className="btn btn-primary" href="/app/generate">Get the app <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <a className="btn btn-secondary" href="#features">See how it works</a>
-          </div>
-        </div>
+      <main id="main" tabIndex={-1}>
 
-        <div className="stage" role="group" aria-label="TasteChef app preview">
-          <div className="app">
-            <div className="app-top">
-              <div className="app-brand"><span className="mini-mark"><svg aria-hidden="true"><use href="#i-bowl"/></svg></span><span>TasteChef</span></div>
-              <div className="app-crumb">Kitchen / Dinner</div>
-              <div className="app-status"><span className="status-dot"></span>On device</div>
-            </div>
-            <div className="app-body">
-              <div className="app-side">
-                <nav className="app-nav" aria-label="App preview sections">
-                  <button className={`app-tab${activePane === 'cook' ? ' is-active' : ''}`} type="button" data-pane="cook" aria-pressed={activePane === 'cook'} onClick={() => setActivePane('cook')}><svg aria-hidden="true"><use href="#i-cook"/></svg>Cook</button>
-                  <button className={`app-tab${activePane === 'pantry' ? ' is-active' : ''}`} type="button" data-pane="pantry" aria-pressed={activePane === 'pantry'} onClick={() => setActivePane('pantry')}><svg aria-hidden="true"><use href="#i-pantry"/></svg>Pantry</button>
-                  <button className={`app-tab${activePane === 'taste' ? ' is-active' : ''}`} type="button" data-pane="taste" aria-pressed={activePane === 'taste'} onClick={() => setActivePane('taste')}><svg aria-hidden="true"><use href="#i-taste"/></svg>Taste</button>
-                  <button className={`app-tab${activePane === 'saved' ? ' is-active' : ''}`} type="button" data-pane="saved" aria-pressed={activePane === 'saved'} onClick={() => setActivePane('saved')}><svg aria-hidden="true"><use href="#i-saved"/></svg>Saved</button>
-                </nav>
-                <div className="app-side-plan">
-                  <span className="asp-label">Tonight</span>
-                  <div className="asp-recipe">
-                    <span className="asp-thumb"><svg aria-hidden="true"><use href="#i-bowl"/></svg></span>
-                    <div><strong>Lemon rice</strong><span>92% match</span></div>
-                  </div>
-                  <div className="asp-row"><span>Pantry match</span><b>82%</b></div>
-                  <div className="asp-row"><span>Taste rules</span><b>3</b></div>
-                  <div className="asp-row"><span>Time budget</span><b>20 min</b></div>
-                  <div className="asp-track"><i style={{ width: '82%' }}></i></div>
+        {/* HERO */}
+        <section className="hero">
+          <div className="wrap">
+            <div className="hero-grid">
+              <div className="hero-copy">
+                <p className="eyebrow">Pre-launch · Built for real appetites</p>
+                <h1>Cooking that respects what you will <span className="mark">actually eat</span>.</h1>
+                <p className="hero-lede">Tell us how you like your food — crisp, tender, never slimy — and what is already in your kitchen. TasteChef writes recipes around your tastes, your allergens and what you’ll genuinely enjoy.</p>
+                <div className="hero-actions">
+                  <a className="btn btn-primary" href={START_FREE}>Start free <Arrow /></a>
+                  <a className="btn btn-secondary" href="#how">See how it works</a>
                 </div>
-                <div className="app-side-foot"><span>Pantry</span><strong>9 items</strong></div>
+                <p className="hero-trust">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M10 2.5l6 2.5v5c0 3.6-2.5 6.4-6 7.5-3.5-1.1-6-3.9-6-7.5V5l6-2.5Z" />
+                    <path d="M7.2 10l2 2 3.6-4" />
+                  </svg>
+                  No credit card. Your allergies are always checked.
+                </p>
               </div>
-              <div className="app-main">
-                <div className={`app-pane${activePane === 'cook' ? ' is-active' : ''}`} data-pane="cook">
-                  <div className="app-head">
-                    <div><h2>Tonight’s dinner</h2><p aria-live="polite">{generated ? 'Generated from 9 pantry items · 2 servings' : '9 pantry items · 2 servings · 20 min max'}</p></div>
-                    <button className="app-generate" type="button" id="generate" onClick={() => { setSelected((current) => (current + 1) % 3); setGenerated(true); }}>Generate <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-                  </div>
-                  <div className="recipe-grid" id="recipe-grid">
-                    <article className={`recipe${selected === 0 ? ' is-selected' : ''}`}>
-                      <div className="recipe-art">
-                        <svg className="recipe-illus" viewBox="0 0 120 80" aria-hidden="true">
-                          <ellipse cx="60" cy="69" rx="35" ry="4" fill="#1e40af" opacity=".14"/>
-                          <path d="M26 39h68c0 16-15 26-34 26S26 55 26 39Z" fill="#fffdf8" stroke="#141314" strokeWidth="2"/>
-                          <path d="M32 39c2-12 13-20 28-20s26 8 28 20Z" fill="#e8ecfa" stroke="#141314" strokeWidth="2"/>
-                          <path d="M43 31c4-5 10-7 17-7s13 2 17 7" fill="none" stroke="#1e40af" strokeWidth="3" strokeLinecap="round"/>
-                          <path d="M48 29c3-3 7-4 12-4s9 1 12 4" fill="none" stroke="#141314" strokeWidth="1.4" strokeLinecap="round"/>
-                          <circle cx="42" cy="35" r="2" fill="#1e40af"/><circle cx="58" cy="32" r="1.6" fill="#1e40af"/><circle cx="74" cy="35" r="2" fill="#1e40af"/>
-                          <path d="M80 23c4-5 9-7 14-6-1 6-5 10-11 10" fill="#e8ecfa" stroke="#141314" strokeWidth="1.4" strokeLinejoin="round"/>
-                          <path d="M79 28c-2-4-6-6-10-6 1 4 3 7 7 8" fill="#fbfaf4" stroke="#141314" strokeWidth="1.4" strokeLinejoin="round"/>
-                          <path d="M35 22c-3-3-7-4-10-3 1 4 4 6 8 6" fill="#1e40af"/>
-                          <circle cx="60" cy="54" r="2.5" fill="#1e40af"/>
-                        </svg>
-                      </div>
-                      <div className="recipe-body">
-                        <h3>Lemon rice &amp; greens</h3>
-                        <p>20 min · 1 pan</p>
-                        <span className="match">92% match</span>
-                        <div className="recipe-ing"><span>Eggs</span><span>Rice</span><span>Lemon</span></div>
-                        <div className="recipe-why"><span>Uses 6 of 9</span><span>2 missing</span></div>
-                      </div>
-                    </article>
-                    <article className={`recipe${selected === 1 ? ' is-selected' : ''}`}>
-                      <div className="recipe-art">
-                        <svg className="recipe-illus" viewBox="0 0 120 80" aria-hidden="true">
-                          <ellipse cx="60" cy="68" rx="38" ry="4" fill="#1e40af" opacity=".14"/>
-                          <ellipse cx="60" cy="44" rx="37" ry="21" fill="#e8ecfa" stroke="#141314" strokeWidth="2"/>
-                          <ellipse cx="60" cy="44" rx="29" ry="15" fill="#1e40af" opacity=".22"/>
-                          <circle cx="49" cy="40" r="10" fill="#fffdf8" stroke="#141314" strokeWidth="1.6"/>
-                          <circle cx="49" cy="40" r="4" fill="#1e40af"/>
-                          <circle cx="72" cy="48" r="9" fill="#fffdf8" stroke="#141314" strokeWidth="1.6"/>
-                          <circle cx="72" cy="48" r="3.5" fill="#1e40af"/>
-                          <path d="M38 30c4-3 9-4 13-3" fill="none" stroke="#141314" strokeWidth="1.4" strokeLinecap="round"/>
-                          <path d="M85 34c-2-4-6-6-10-6" fill="none" stroke="#141314" strokeWidth="1.4" strokeLinecap="round"/>
-                          <circle cx="62" cy="31" r="2" fill="#1e40af"/><circle cx="82" cy="43" r="1.6" fill="#1e40af"/>
-                        </svg>
-                      </div>
-                      <div className="recipe-body">
-                        <h3>Eggs in tomato</h3>
-                        <p>15 min · 1 pan</p>
-                        <span className="match">88% match</span>
-                        <div className="recipe-ing"><span>Eggs</span><span>Tomato</span><span>Herbs</span></div>
-                        <div className="recipe-why"><span>Uses 5 of 9</span><span>3 missing</span></div>
-                      </div>
-                    </article>
-                    <article className={`recipe${selected === 2 ? ' is-selected' : ''}`}>
-                      <div className="recipe-art">
-                        <svg className="recipe-illus" viewBox="0 0 120 80" aria-hidden="true">
-                          <ellipse cx="60" cy="69" rx="34" ry="4" fill="#1e40af" opacity=".14"/>
-                          <path d="M29 38h62v8c0 12-14 20-31 20S29 58 29 46v-8Z" fill="#fffdf8" stroke="#141314" strokeWidth="2"/>
-                          <path d="M29 38c0-6 14-10 31-10s31 4 31 10" fill="#e8ecfa" stroke="#141314" strokeWidth="2"/>
-                          <path d="M23 38h74" stroke="#141314" strokeWidth="2" strokeLinecap="round"/>
-                          <path d="M41 25c0-4 4-4 4-8M60 23c0-4 4-4 4-8M79 25c0-4 4-4 4-8" fill="none" stroke="#1e40af" strokeWidth="2" strokeLinecap="round"/>
-                          <circle cx="47" cy="46" r="4" fill="#1e40af"/><circle cx="61" cy="50" r="4" fill="#1e40af"/><circle cx="75" cy="45" r="4" fill="#1e40af"/><circle cx="55" cy="58" r="4" fill="#1e40af"/><circle cx="70" cy="57" r="4" fill="#1e40af"/>
-                          <path d="M38 52c3-3 7-4 10-3" fill="none" stroke="#141314" strokeWidth="1.4" strokeLinecap="round"/>
-                        </svg>
-                      </div>
-                      <div className="recipe-body">
-                        <h3>Chickpea stew</h3>
-                        <p>25 min · 1 pot</p>
-                        <span className="match">84% match</span>
-                        <div className="recipe-ing"><span>Chickpeas</span><span>Tomato</span><span>Garlic</span></div>
-                        <div className="recipe-why"><span>Uses 7 of 9</span><span>1 missing</span></div>
-                      </div>
-                    </article>
-                  </div>
-                  <div className="app-bottom">
-                    <div className="using"><span>Using</span><span className="mini-chip on">Eggs</span><span className="mini-chip">Spinach</span><span className="mini-chip">Rice</span><span className="mini-chip">Lemon</span><span className="mini-chip">Tahini</span></div>
-                    <a className="app-start" href="/app/generate">Start cooking <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-                  </div>
-                </div>
 
-                <div className={`app-pane${activePane === 'pantry' ? ' is-active' : ''}`} data-pane="pantry">
-                  <div className="app-head">
-                    <div><h2>Your pantry</h2><p>9 items · updated just now</p></div>
-                    <button className="app-generate" type="button">Add item</button>
+              <div className="hero-visual">
+                <div className="browser" aria-hidden="true">
+                  <div className="browser-chrome">
+                    <span className="dots"><i /><i /><i /></span>
+                    <span className="urlbar">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <rect x="4" y="8" width="12" height="8" rx="2" />
+                        <path d="M7 8V6a3 3 0 0 1 6 0v2" />
+                      </svg>
+                      tastechef.app/cook/dinner
+                    </span>
                   </div>
-                  <div className="pantry-search"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Find an ingredient</span><span className="kbd">⌘K</span></div>
-                  <div className="pantry-grid">
-                    <span className="pchip on">Eggs <b>6</b></span><span className="pchip on">Spinach <b>1 bag</b></span><span className="pchip on">Rice <b>500g</b></span><span className="pchip on">Lemon <b>1</b></span>
-                    <span className="pchip on">Tahini <b>½ jar</b></span><span className="pchip on">Chickpeas <b>2 tins</b></span><span className="pchip on">Garlic <b>1 bulb</b></span><span className="pchip on">Olive oil <b>—</b></span>
-                    <span className="pchip">Mushrooms</span><span className="pchip">Cream</span><span className="pchip">Pasta</span><span className="pchip">Feta</span>
-                  </div>
-                  <div className="match-bar">
-                    <div className="mb-top"><span>Pantry match</span><strong>82%</strong></div>
-                    <div className="mb-track"><i style={{ width: '82%' }}></i></div>
-                    <p>2 missing for tonight’s shortlist: lemon zest, fresh herbs.</p>
-                  </div>
-                </div>
-
-                <div className={`app-pane${activePane === 'taste' ? ' is-active' : ''}`} data-pane="taste">
-                  <div className="app-head">
-                    <div><h2>Your taste</h2><p>Learned from 12 ratings</p></div>
-                    <button className="app-generate" type="button">Edit rules</button>
-                  </div>
-                  <div className="taste-list">
-                    <div className="taste-row"><div><strong>No slimy textures</strong><span>Mushrooms, okra, cooked tomato</span></div><span className="switch on" aria-hidden="true"><i></i></span></div>
-                    <div className="taste-row"><div><strong>Loves charred edges</strong><span>Roasted veg, seared fish, toast</span></div><span className="switch on" aria-hidden="true"><i></i></span></div>
-                    <div className="taste-row"><div><strong>Keep it mild</strong><span>Chilli on the side, not in the pan</span></div><span className="switch" aria-hidden="true"><i></i></span></div>
-                  </div>
-                  <div className="taste-rating">
-                    <span>Last night’s dinner</span>
-                    <div className="stars" aria-label="4 out of 5 stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg className="off"><use href="#i-star"/></svg></div>
-                  </div>
-                </div>
-
-                <div className={`app-pane${activePane === 'saved' ? ' is-active' : ''}`} data-pane="saved">
-                  <div className="app-head">
-                    <div><h2>Saved</h2><p>4 recipes for later</p></div>
-                    <button className="app-generate" type="button">New list</button>
-                  </div>
-                  <div className="saved-list">
-                    <div className="saved-row"><span className="saved-art"><svg aria-hidden="true"><use href="#i-bowl"/></svg></span><div><strong>Lemon rice &amp; greens</strong><span>20 min · 92% match</span></div><span className="bookmark"><svg aria-hidden="true"><use href="#i-saved"/></svg></span></div>
-                    <div className="saved-row"><span className="saved-art"><svg aria-hidden="true"><use href="#i-pot"/></svg></span><div><strong>Eggs in tomato</strong><span>15 min · 88% match</span></div><span className="bookmark"><svg aria-hidden="true"><use href="#i-saved"/></svg></span></div>
-                    <div className="saved-row"><span className="saved-art"><svg aria-hidden="true"><use href="#i-leaf"/></svg></span><div><strong>Chickpea stew</strong><span>25 min · 84% match</span></div><span className="bookmark"><svg aria-hidden="true"><use href="#i-saved"/></svg></span></div>
-                    <div className="saved-row"><span className="saved-art"><svg aria-hidden="true"><use href="#i-bowl"/></svg></span><div><strong>Overnight oats</strong><span>5 min · 79% match</span></div><span className="bookmark"><svg aria-hidden="true"><use href="#i-saved"/></svg></span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="stage-foot">
-          <p className="trust"><svg aria-hidden="true"><use href="#i-check"/></svg>No account, no API key, no signal required.</p>
-          <dl className="figures">
-            <div className="figure"><b>52</b><span>recipes offline</span></div>
-            <div className="figure"><b>128</b><span>ingredients mapped</span></div>
-            <div className="figure"><b>9</b><span>allergen groups checked</span></div>
-            <div className="figure"><b>0</b><span>bars of signal needed</span></div>
-          </dl>
-        </div>
-      </div>
-    </section>
-
-    <section className="section" id="features">
-      <div className="tc-container">
-        <div className="section-head center">
-          <div className="eyebrow"><span className="bar"></span>What it does</div>
-          <h2>Built around your kitchen</h2>
-          <p className="lead">Not a chatbot with a recipe habit. A small, opinionated engine that knows your ingredients, your rules and the way you actually like to eat.</p>
-        </div>
-
-        <div className="feature-list">
-          <div className="feature">
-            <div className="feature-media">
-              <div className="shot" aria-hidden="true">
-                <div className="shot-window">
-                  <div className="shot-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="shot-title">Pantry</span><span className="shot-status">9 items</span></div>
-                  <div className="shot-body">
-                    <div className="shot-head"><div><h4>What’s in the kitchen</h4><p>Tap to add, remove or update a quantity.</p></div><span className="mini-btn">Add</span></div>
-                    <div className="pantry-search"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Find an ingredient</span></div>
-                    <div className="pt-filters"><span className="pt-filter on">All 9</span><span className="pt-filter">Produce</span><span className="pt-filter">Dairy</span><span className="pt-filter">Dry</span></div>
-                    <div className="p-table">
-                      <div className="pt-row pt-head"><span>Ingredient</span><span>Have</span><span>Used in</span></div>
-                      <div className="pt-row"><span className="pt-name"><i className="pt-dot"></i>Eggs</span><span>6</span><span>14</span></div>
-                      <div className="pt-row"><span className="pt-name"><i className="pt-dot"></i>Spinach</span><span>1 bag</span><span>9</span></div>
-                      <div className="pt-row"><span className="pt-name"><i className="pt-dot"></i>Rice</span><span>500 g</span><span>11</span></div>
-                      <div className="pt-row"><span className="pt-name"><i className="pt-dot"></i>Lemon</span><span>1</span><span>7</span></div>
-                      <div className="pt-row"><span className="pt-name"><i className="pt-dot"></i>Chickpeas</span><span>2 tins</span><span>8</span></div>
-                      <div className="pt-row off"><span className="pt-name"><i className="pt-dot"></i>Mushrooms</span><span>—</span><span>0</span></div>
-                      <p className="p-note"><span>Showing 6 of 9 items</span><span>128 in library</span></p>
-                    </div>
-                    <div className="match-bar">
-                      <div className="mb-top"><span>Pantry match</span><strong>82%</strong></div>
-                      <div className="mb-track"><i style={{ width: '82%' }}></i></div>
-                      <p>2 missing for the shortlist. TasteChef tells you before you start, not halfway through.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="feature-copy">
-              <div className="feature-index"><span>01</span>Pantry</div>
-              <h3>Cook from your pantry</h3>
-              <p>Tell it what you have — half a lemon, three eggs, the rice at the back of the cupboard. TasteChef matches it against 52 recipes and shows what you’re missing before you start.</p>
-              <a className="text-link" href="/app/generate">Try the pantry <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            </div>
-          </div>
-
-          <div className="feature swap" id="taste">
-            <div className="feature-media">
-              <div className="shot" aria-hidden="true">
-                <div className="shot-window">
-                  <div className="shot-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="shot-title">Taste</span><span className="shot-status">12 ratings</span></div>
-                  <div className="shot-body">
-                    <div className="shot-head"><div><h4>Your taste, not a guess</h4><p>Hard rules and soft preferences live together.</p></div><span className="mini-btn">Edit</span></div>
-                    <div className="taste-dial">
-                      <div className="td-top"><span>Mushroom texture</span><b>Never</b></div>
-                      <div className="td-track"><i></i><span className="td-knob"></span></div>
-                      <div className="td-scale"><span>Any</span><span>Soft</span><span>Never</span></div>
-                    </div>
-                    <div className="taste-list">
-                      <div className="taste-row"><div><strong>No slimy textures</strong><span>Mushrooms, okra, cooked tomato</span></div><span className="switch on" aria-hidden="true"><i></i></span></div>
-                      <div className="taste-row"><div><strong>Loves charred edges</strong><span>Roasted veg, seared fish, toast</span></div><span className="switch on" aria-hidden="true"><i></i></span></div>
-                      <div className="taste-row"><div><strong>Keep it mild</strong><span>Chilli on the side, not in the pan</span></div><span className="switch" aria-hidden="true"><i></i></span></div>
-                      <div className="taste-row"><div><strong>No dairy</strong><span>Milk, cream, soft cheese</span></div><span className="switch" aria-hidden="true"><i></i></span></div>
-                    </div>
-                    <div className="taste-learned"><span>Learned this week</span><div><b>+ coriander</b><b className="neg">− soft aubergine</b></div></div>
-                    <div className="taste-rating"><span>Last night’s dinner</span><div className="stars" aria-label="4 out of 5 stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg className="off"><use href="#i-star"/></svg></div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="feature-copy">
-              <div className="feature-index"><span>02</span>Taste</div>
-              <h3>Taste, not guesswork</h3>
-              <p>Rate a dish, flag a texture, add a rule. The engine learns what you reach for and quietly stops suggesting the mushrooms you can’t stand.</p>
-              <a className="text-link" href="/app/generate">How taste works <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            </div>
-          </div>
-
-          <div className="feature" id="offline">
-            <div className="feature-media">
-              <div className="shot phone-shot" aria-hidden="true">
-                <div className="phone-wrap">
-                  <div className="phone">
-                    <div className="phone-screen">
-                      <div className="ps-bar"><span>9:41</span><span className="ps-nosignal"><svg aria-hidden="true"><use href="#i-signal-off"/></svg>No signal</span></div>
-                      <div className="ps-body">
-                        <div className="ps-title">Tonight’s dinner</div>
-                        <div className="ps-art">
-                          <svg viewBox="0 0 120 80" aria-hidden="true">
-                            <ellipse cx="60" cy="69" rx="35" ry="4" fill="#1e40af" opacity=".14"/>
-                            <path d="M26 39h68c0 16-15 26-34 26S26 55 26 39Z" fill="#fffdf8" stroke="#141314" strokeWidth="2"/>
-                            <path d="M32 39c2-12 13-20 28-20s26 8 28 20Z" fill="#e8ecfa" stroke="#141314" strokeWidth="2"/>
-                            <path d="M43 31c4-5 10-7 17-7s13 2 17 7" fill="none" stroke="#1e40af" strokeWidth="3" strokeLinecap="round"/>
-                            <path d="M48 29c3-3 7-4 12-4s9 1 12 4" fill="none" stroke="#141314" strokeWidth="1.4" strokeLinecap="round"/>
-                            <circle cx="42" cy="35" r="2" fill="#1e40af"/><circle cx="58" cy="32" r="1.6" fill="#1e40af"/><circle cx="74" cy="35" r="2" fill="#1e40af"/>
-                            <path d="M80 23c4-5 9-7 14-6-1 6-5 10-11 10" fill="#e8ecfa" stroke="#141314" strokeWidth="1.4" strokeLinejoin="round"/>
-                            <path d="M79 28c-2-4-6-6-10-6 1 4 3 7 7 8" fill="#fbfaf4" stroke="#141314" strokeWidth="1.4" strokeLinejoin="round"/>
-                            <path d="M35 22c-3-3-7-4-10-3 1 4 4 6 8 6" fill="#1e40af"/>
-                            <circle cx="60" cy="54" r="2.5" fill="#1e40af"/>
+                  <div className="mock">
+                    <div className="mock-top">
+                      <span className="mock-brand">
+                        <i>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                            <path d="M4 12h16c0 4.4-3.6 8-8 8s-8-3.6-8-8Z" />
+                            <path d="M9 8c-.5-1 .3-1.8.1-2.7" />
                           </svg>
+                        </i>
+                        TasteChef
+                      </span>
+                      <span className="mock-tabs">
+                        <span className="mock-tab">Pantry</span>
+                        <span className="mock-tab on">Dinner</span>
+                        <span className="mock-tab">Plan</span>
+                      </span>
+                      <span className="mock-avatar">M</span>
+                    </div>
+                    <div className="mock-body">
+                      <div>
+                        <div className="mock-label">Tonight’s pick</div>
+                        <p className="mock-title">Crispy salmon, charred greens &amp; lemon yoghurt</p>
+                        <div className="mock-chips">
+                          <span className="mchip blue">
+                            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                              <path d="M4 10.5l4 4 8-9" />
+                            </svg>
+                            92% pantry match
+                          </span>
+                          <span className="mchip">30 min</span>
+                          <span className="mchip">2 servings</span>
                         </div>
-                        <div className="ps-card">
-                          <strong>Lemon rice &amp; greens</strong>
-                          <span>20 min · 1 pan · uses 6 of 9</span>
-                          <span className="ps-match">92% match</span>
+                        <ul className="mock-list">
+                          <li><span className="tick"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M4 10.5l4 4 8-9" /></svg></span>Salmon fillets · 2</li>
+                          <li><span className="tick"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M4 10.5l4 4 8-9" /></svg></span>Tenderstem broccoli · 200 g</li>
+                          <li><span className="tick"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M4 10.5l4 4 8-9" /></svg></span>Greek yoghurt · 150 g</li>
+                          <li><span className="tick"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M4 10.5l4 4 8-9" /></svg></span>Lemon · 1</li>
+                          <li className="miss"><span className="tick"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l8 8M14 6l-8 8" /></svg></span>Dill · swap or skip</li>
+                        </ul>
+                        <p className="mock-missing"><b>8 of 10 ingredients</b> already in your pantry</p>
+                      </div>
+                      <div className="mock-side">
+                        <div className="texture-card">
+                          <div className="texture-head"><strong>Texture notes</strong><span>For you</span></div>
+                          <div className="texture-rows">
+                            <div className="texture-row"><b>Salmon</b><span>Crisp skin, soft centre</span></div>
+                            <div className="texture-row"><b>Greens</b><span>Tender, not mushy</span></div>
+                            <div className="texture-row"><b>Sauce</b><span>Glossy, no lumps</span></div>
+                          </div>
                         </div>
-                        <div className="ps-list">
-                          <div><span>Generated</span><b>on device</b></div>
-                          <div><span>Data sent</span><b>0 KB</b></div>
-                          <div><span>Offline mode</span><b>On</b></div>
+                        <div className="nutrition">
+                          <div className="nutrition-head">Per serving <em>USDA data</em></div>
+                          <div className="nutrition-grid">
+                            <div><b>540</b><span>kcal</span></div>
+                            <div><b>38 g</b><span>protein</span></div>
+                            <div><b>21 g</b><span>carbs</span></div>
+                            <div><b>34 g</b><span>fat</span></div>
+                          </div>
+                        </div>
+                        <div className="mock-tags">
+                          <span className="tag on">just right</span>
+                          <span className="tag">too mushy</span>
+                          <span className="tag">crisp skin</span>
                         </div>
                       </div>
-                      <div className="ps-toast"><svg aria-hidden="true"><use href="#i-check"/></svg>Recipe ready · 0.4s</div>
+                    </div>
+                    <div className="mock-foot">
+                      <p>How was the texture?</p>
+                      <Stars />
+                      <button className="mock-rate" type="button" tabIndex={-1}>Rate</button>
                     </div>
                   </div>
-                  <div className="phone-badge"><svg aria-hidden="true"><use href="#i-check"/></svg>0 KB sent</div>
+                </div>
+                <p className="hero-note"><b>Illustrative interface</b> — a design mock, not a live screenshot.</p>
+              </div>
+            </div>
+
+            <div className="hero-facts">
+              <div className="fact"><strong><em>4</em> meal slots</strong><span>Breakfast through to snacks, planned around your day.</span></div>
+              <div className="fact"><strong><em>3</em> recipes per request</strong><span>Enough choice to cook, not a scroll marathon.</span></div>
+              <div className="fact"><strong>USDA-backed</strong><span>Nutrition calculated from FoodData Central values.</span></div>
+            </div>
+          </div>
+        </section>
+
+        {/* LOGO CLOUD */}
+        <section className="logos" aria-label="Data and tools">
+          <div className="wrap logos-inner">
+            <p className="cap">Built on trusted food data.</p>
+            <div className="logo-row">
+              <span>USDA FoodData Central</span>
+              <span>TheMealDB</span>
+              <span>Supabase</span>
+              <span>Anthropic Claude</span>
+              <span>OpenAI</span>
+              <span>pgvector</span>
+            </div>
+            <p className="fine">Wordmarks shown for identification only. No endorsement implied.</p>
+          </div>
+        </section>
+
+        {/* FEATURES */}
+        <section className="section" id="features">
+          <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">Why it works</p>
+              <h2>Your tastes are specific. Your recipes should be too.</h2>
+              <p>Most recipe apps ask what diet you are on. TasteChef asks how you actually like to eat — then cooks around it.</p>
+            </div>
+
+            <div className="feature">
+              <div className="feature-copy">
+                <h3>Texture is a taste, not a fuss.</h3>
+                <p>Some people don’t dislike mushrooms. They dislike slimy ones. Set texture notes like <b>crisp edges, soft centre</b> or <b>never soggy</b>, and every recipe is written to cook that way. Rate a meal “too mushy” and it learns.</p>
+                <ul className="pill-list">
+                  <li><Check />Crisp</li>
+                  <li><Check />Tender</li>
+                  <li><Check />No slime</li>
+                  <li><Check />Al dente</li>
+                </ul>
+                <a className="text-link" href="#how">How taste profiles work <Arrow size={14} /></a>
+              </div>
+              <div className="feature-media">
+                <svg className="scene" viewBox="0 0 560 380" role="img" aria-label="Illustration of a plated salmon dish with texture notes">
+                  <g fill="none" stroke="#0a1024" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="252" cy="204" r="132" fill="#fff" />
+                    <circle cx="252" cy="204" r="106" fill="#f8faff" stroke="#dbe3f7" strokeWidth="1.6" />
+                    <path d="M120 350h264" stroke="#dbe3f7" strokeWidth="1.6" />
+                  </g>
+                  <g transform="rotate(-9 240 190)">
+                    <path d="M180 202c-4-9 2-20 14-27 17-10 45-14 70-10 22 4 38 14 40 27 2 12-11 21-31 24-28 4-62 1-79-5-6-2-11-5-14-9Z" fill="#ffc7a8" stroke="#0a1024" strokeWidth="2.2" strokeLinejoin="round" />
+                    <path d="M187 188c17-9 43-12 66-9 17 2 28 7 34 14" fill="none" stroke="#e08a62" strokeWidth="2" strokeLinecap="round" opacity=".75" />
+                    <path d="M205 197c15 6 31 8 47 5M212 208c13 5 27 6 40 4" fill="none" stroke="#0a1024" strokeWidth="1.6" strokeLinecap="round" opacity=".32" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2" strokeLinecap="round">
+                    <path d="M324 226c8-14 22-18 30-10s2 22-12 25-24-4-18-15Z" fill="#b9edd0" />
+                    <path d="M342 244c10-10 23-8 27 2s-5 20-17 18-16-12-10-20Z" fill="#b9edd0" />
+                    <path d="M313 250c-6 14-1 26 8 30" fill="none" />
+                    <path d="M338 262v18" fill="none" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="174" cy="252" r="20" fill="#ffe08a" />
+                    <path d="M174 252l14-9M174 252l2 17M174 252l-15-9M174 252l-9 15" strokeWidth="1.5" />
+                  </g>
+                  <g stroke="#2e5bff" strokeWidth="2.4" strokeLinecap="round">
+                    <path d="M150 130c-8-10 6-16 0-26M172 122c-8-10 6-16 0-26" opacity=".5" />
+                    <circle cx="300" cy="300" r="4" fill="#2e5bff" stroke="none" />
+                    <circle cx="318" cy="310" r="2.6" fill="#2e5bff" stroke="none" />
+                    <circle cx="286" cy="314" r="3" fill="#2e5bff" stroke="none" />
+                  </g>
+                  <g transform="rotate(14 400 230)" stroke="#0a1024" strokeWidth="2.4" strokeLinecap="round" fill="#fff">
+                    <rect x="392" y="180" width="14" height="88" rx="7" />
+                    <path d="M390 176v-34M395 176v-38M400 176v-36M405 176v-32" fill="none" />
+                    <path d="M390 176h16" fill="none" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2" strokeLinecap="round" fill="#fff">
+                    <path d="M436 316l18-56 12 4-18 56Z" />
+                  </g>
+                </svg>
+                <span className="ill-chip pos-a"><i />crisp edges</span>
+                <span className="ill-chip pos-b"><i />soft centre</span>
+              </div>
+            </div>
+
+            <div className="feature flip">
+              <div className="feature-copy">
+                <h3>Cook from what you have. Not what you are missing.</h3>
+                <p>Add your pantry, flag what needs using first, then pick a meal slot and how long you have got. TasteChef builds dinner around it — and tells you honestly when a recipe needs one extra thing.</p>
+                <ul className="pill-list">
+                  <li><Check />Expiring soon</li>
+                  <li><Check />30 minutes</li>
+                  <li><Check />Dinner for 2</li>
+                  <li><Check />High protein</li>
+                </ul>
+                <a className="text-link" href="#how">See the pantry in action <Arrow size={14} /></a>
+              </div>
+              <div className="feature-media">
+                <svg className="scene" viewBox="0 0 560 380" role="img" aria-label="Illustration of a pantry shelf with jars, vegetables and an expiring-soon note">
+                  <g fill="none" stroke="#0a1024" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="112" y="84" width="336" height="228" rx="14" fill="#fff" />
+                    <path d="M112 200h336" />
+                    <path d="M128 312v22M432 312v22" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2">
+                    <rect x="146" y="124" width="58" height="66" rx="9" fill="#f6f8ff" />
+                    <rect x="152" y="116" width="46" height="12" rx="5" fill="#2e5bff" />
+                    <path d="M146 154h58" opacity=".25" />
+                    <rect x="224" y="132" width="62" height="58" rx="9" fill="#ffc7a8" />
+                    <rect x="230" y="124" width="50" height="12" rx="5" fill="#0a1024" />
+                    <circle cx="242" cy="156" r="4" fill="#0a1024" stroke="none" opacity=".35" />
+                    <circle cx="258" cy="168" r="4" fill="#0a1024" stroke="none" opacity=".35" />
+                    <circle cx="272" cy="152" r="4" fill="#0a1024" stroke="none" opacity=".35" />
+                    <rect x="306" y="128" width="56" height="62" rx="9" fill="#b9edd0" />
+                    <rect x="312" y="120" width="44" height="12" rx="5" fill="#fff" />
+                    <path d="M306 158h56" opacity=".25" />
+                    <rect x="382" y="140" width="42" height="50" rx="8" fill="#ffe08a" />
+                    <rect x="388" y="132" width="30" height="11" rx="5" fill="#fff" />
+                  </g>
+                  <text x="175" y="166" fontFamily="Host Grotesk, sans-serif" fontSize="10" fontWeight="600" fill="#0a1024" textAnchor="middle">rice</text>
+                  <text x="255" y="168" fontFamily="Host Grotesk, sans-serif" fontSize="10" fontWeight="600" fill="#0a1024" textAnchor="middle">chickpeas</text>
+                  <g stroke="#0a1024" strokeWidth="2.2" strokeLinejoin="round">
+                    <path d="M176 250h132l-14 62h-104Z" fill="#f6f8ff" />
+                    <path d="M192 250c0-16 12-28 28-28s28 12 28 28" fill="none" />
+                    <path d="M212 262v38M240 262v38M268 262v38" opacity=".22" strokeWidth="1.5" />
+                    <circle cx="290" cy="250" r="17" fill="#ff8f6b" />
+                    <path d="M284 238c2-6 7-8 10-8" fill="none" stroke="#b9edd0" strokeWidth="3" />
+                    <circle cx="322" cy="258" r="14" fill="#ffe08a" />
+                    <path d="M312 240c8-8 20-8 26 0" fill="none" stroke="#b9edd0" strokeWidth="4" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2" strokeLinecap="round">
+                    <path d="M360 300c-6-20 4-42 22-52" fill="none" />
+                    <path d="M364 268c-12-2-20-12-18-24 14-2 24 8 24 20" fill="#b9edd0" />
+                    <path d="M378 280c-2-14 8-26 22-28 4 14-6 26-20 28" fill="#b9edd0" />
+                    <path d="M352 254c-12 2-24-6-26-18 14-4 26 4 28 16" fill="#b9edd0" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2.2" fill="#fff">
+                    <circle cx="470" cy="110" r="33" />
+                    <path d="M470 92v20l13 8" fill="none" stroke="#2e5bff" strokeWidth="2.6" strokeLinecap="round" />
+                  </g>
+                  <text x="470" y="160" fontFamily="Host Grotesk, sans-serif" fontSize="11" fontWeight="600" fill="#5b6681" textAnchor="middle">30 min</text>
+                </svg>
+                <span className="ill-chip blue pos-c">use soon</span>
+                <span className="ill-chip pos-d"><i />dinner · serves 2</span>
+              </div>
+            </div>
+
+            <div className="feature">
+              <div className="feature-copy">
+                <h3>Allergens checked by code. Nutrition from USDA.</h3>
+                <p>Every recipe is screened against your allergen list by deterministic code, not a language model’s best guess. Nutrition comes from USDA FoodData Central, so the numbers mean something. Ratings and quick tags like “too mushy” come from you.</p>
+                <ul className="pill-list">
+                  <li><Check />Code-checked allergens</li>
+                  <li><Check />USDA nutrition</li>
+                  <li><Check />No guesswork</li>
+                </ul>
+                <a className="text-link" href="#faq">How allergen checks work <Arrow size={14} /></a>
+              </div>
+              <div className="feature-media">
+                <svg className="scene" viewBox="0 0 560 380" role="img" aria-label="Illustration of a shield with code brackets, allergen tags and a nutrition panel">
+                  <g fill="none" stroke="#0a1024" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M268 56l104 40v96c0 62-44 108-104 132-60-24-104-70-104-132V96l104-40Z" fill="#eef2ff" />
+                    <path d="M268 90l74 28v72c0 46-31 81-74 100-43-19-74-54-74-100v-72l74-28Z" fill="#fff" stroke="#c9d5f5" strokeWidth="1.6" />
+                  </g>
+                  <text x="268" y="208" fontFamily="Host Grotesk, sans-serif" fontSize="48" fontWeight="600" fill="#2e5bff" textAnchor="middle" letterSpacing="-3">&lt;/&gt;</text>
+                  <g>
+                    <circle cx="340" cy="290" r="30" fill="#2e5bff" stroke="#0a1024" strokeWidth="2.2" />
+                    <path d="M327 290l9 10 18-20" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </g>
+                  <g stroke="#dbe3f7" strokeWidth="2" strokeLinecap="round">
+                    <path d="M92 128h64M72 160h52M96 300h58" />
+                  </g>
+                  <g stroke="#0a1024" strokeWidth="2" fill="#fff">
+                    <circle cx="106" cy="248" r="12" />
+                    <path d="M106 242v12M100 248h12" />
+                  </g>
+                </svg>
+                <span className="ill-chip avoid pos-c">peanut</span>
+                <span className="ill-chip avoid pos-f">shellfish</span>
+                <div className="mini-card" aria-hidden="true">
+                  <div className="mc-top">Per serving <em>USDA</em></div>
+                  <div className="mc-row"><span>Protein</span><span className="mc-bar"><i style={{ width: '76%' }} /></span><b>38 g</b></div>
+                  <div className="mc-row"><span>Carbs</span><span className="mc-bar"><i style={{ width: '34%' }} /></span><b>21 g</b></div>
+                  <div className="mc-row"><span>Fat</span><span className="mc-bar"><i style={{ width: '52%' }} /></span><b>34 g</b></div>
+                </div>
+                <span className="ill-chip pos-h"><i />too mushy</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PROCESS */}
+        <section className="section" id="how" style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="process">
+              <div className="section-head center" style={{ marginBottom: 0, maxWidth: 620 }}>
+                <p className="eyebrow">How it works</p>
+                <h2>Three steps, one dinner.</h2>
+                <p>Set it up once. After that, dinner takes a couple of taps.</p>
+              </div>
+              <div className="steps">
+                <div className="step">
+                  <span className="step-num">1</span>
+                  <h3>Tell us your tastes</h3>
+                  <p>Pick your textures, flavours, diets and the things you would rather skip.</p>
+                </div>
+                <div className="step">
+                  <span className="step-num">2</span>
+                  <h3>Add what is in your kitchen</h3>
+                  <p>Type it in, or add it from a list. Flag what needs using first so nothing goes to waste.</p>
+                </div>
+                <div className="step">
+                  <span className="step-num">3</span>
+                  <h3>Get recipes made for you</h3>
+                  <p>Recipes for your meal slot, time and goals — allergens checked, nutrition filled in.</p>
                 </div>
               </div>
             </div>
-            <div className="feature-copy">
-              <div className="feature-index"><span>03</span>Offline</div>
-              <h3>Offline by design</h3>
-              <p>The recipe engine runs on your phone. No API key, no account, no round trip to a server. It works on the train, in the shop, and in the kitchen with the wifi off.</p>
-              <a className="text-link" href="/app/generate">Try it offline <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section className="section" id="stories" style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">Sample stories</p>
+              <h2>Built for the “only when it is like this” eaters.</h2>
+              <p>These are illustrative reviews written for the preview. They are not real customers.</p>
+            </div>
+            <div className="stories-grid">
+              <article className="quote-card featured">
+                <div>
+                  <span className="sample-tag"><i />Sample content</span>
+                  <span className="quote-mark" aria-hidden="true">
+                    <svg viewBox="0 0 42 30" fill="currentColor">
+                      <path d="M0 30V16C0 6 5 1 15 0v7c-5 1-7 4-7 8h7v15H0Zm24 0V16C24 6 29 1 39 0v7c-5 1-7 4-7 8h7v15H24Z" />
+                    </svg>
+                  </span>
+                  <blockquote>I don’t hate mushrooms. I hate <span className="hl">slimy</span> mushrooms. TasteChef is the first app that understood the difference.</blockquote>
+                </div>
+                <div className="quote-foot">
+                  <span className="avatar" aria-hidden="true">
+                    <svg viewBox="0 0 64 64">
+                      <rect width="64" height="64" fill="#ffd8bf" />
+                      <circle cx="32" cy="30" r="17" fill="#f7c3a1" />
+                      <path d="M14 30c0-13 8-20 18-20s18 7 18 20c-6-3-9-9-9-9-4 4-14 5-19 3-1 3-3 5-8 6Z" fill="#22263a" />
+                      <circle cx="26" cy="30" r="1.8" fill="#0a1024" />
+                      <circle cx="38" cy="30" r="1.8" fill="#0a1024" />
+                      <path d="M27 37c3 2.5 7 2.5 10 0" fill="none" stroke="#0a1024" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M20 30h5M39 30h5" stroke="#0a1024" strokeWidth="1.5" opacity=".6" />
+                    </svg>
+                  </span>
+                  <span className="quote-who"><b>Sample review</b><span>Home cook · two-person household</span></span>
+                </div>
+              </article>
+              <div className="side-quotes">
+                <article className="quote-card">
+                  <div>
+                    <span className="sample-tag"><i />Sample</span>
+                    <blockquote>“I typed ‘no soggy bottoms’ and it actually listened.”</blockquote>
+                  </div>
+                  <div className="quote-foot">
+                    <span className="avatar" aria-hidden="true">
+                      <svg viewBox="0 0 64 64">
+                        <rect width="64" height="64" fill="#dfe7ff" />
+                        <circle cx="32" cy="31" r="16" fill="#e8b48f" />
+                        <path d="M16 31c-2-12 5-21 16-21s18 9 16 21c-2-6-5-8-5-8-5 3-16 4-22 1-2 2-4 4-5 7Z" fill="#3c2a24" />
+                        <circle cx="26" cy="31" r="1.8" fill="#0a1024" />
+                        <circle cx="38" cy="31" r="1.8" fill="#0a1024" />
+                        <path d="M27 38c3 3 7 3 10 0" fill="none" stroke="#0a1024" strokeWidth="1.8" strokeLinecap="round" />
+                        <circle cx="20" cy="34" r="2.5" fill="#f2a08a" opacity=".6" />
+                        <circle cx="44" cy="34" r="2.5" fill="#f2a08a" opacity=".6" />
+                      </svg>
+                    </span>
+                    <span className="quote-who"><b>Sample review</b><span>Batch cook · London</span></span>
+                  </div>
+                </article>
+                <article className="quote-card">
+                  <div>
+                    <span className="sample-tag"><i />Sample</span>
+                    <blockquote>“Dinner from what was already in the fridge. Twice this week.”</blockquote>
+                  </div>
+                  <div className="quote-foot">
+                    <span className="avatar" aria-hidden="true">
+                      <svg viewBox="0 0 64 64">
+                        <rect width="64" height="64" fill="#d9f4e6" />
+                        <circle cx="32" cy="31" r="16" fill="#c98f68" />
+                        <path d="M15 32c0-12 7-21 17-21s17 9 17 21c-3-5-5-6-8-7-3 2-8 3-13 2-4 2-9 1-13 5Z" fill="#141826" />
+                        <circle cx="26" cy="31" r="1.8" fill="#0a1024" />
+                        <circle cx="38" cy="31" r="1.8" fill="#0a1024" />
+                        <path d="M27 38c3 2.5 7 2.5 10 0" fill="none" stroke="#0a1024" strokeWidth="1.8" strokeLinecap="round" />
+                        <path d="M22 24c2-2 5-3 8-3" stroke="#0a1024" strokeWidth="1.4" fill="none" opacity=".5" />
+                      </svg>
+                    </span>
+                    <span className="quote-who"><b>Sample review</b><span>Parent of two · Manchester</span></span>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <p className="sample-note">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <circle cx="10" cy="10" r="7.5" />
+                <path d="M10 6.5v4.5M10 14h.01" strokeLinecap="round" />
+              </svg>
+              All quotes and avatars on this page are sample content for a pre-launch preview. They are not real people or real reviews.
+            </p>
+          </div>
+        </section>
+
+        {/* PRICING */}
+        <section className="section" id="pricing" style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="pricing-head">
+              <div className="section-head">
+                <p className="eyebrow">Pricing</p>
+                <h2>Simple plans, clearly priced.</h2>
+                <p>Start free. Upgrade when the whole household wants in.</p>
+              </div>
+              <span className="badge"><span className="badge-dot" />Placeholder pricing</span>
+            </div>
+            <div className="plans">
+              <article className="plan">
+                <div className="plan-top"><h3 className="plan-name">Free</h3></div>
+                <div className="price"><b>£0</b><span>forever</span></div>
+                <p className="plan-note">For trying a few dinners and seeing how it fits.</p>
+                <ul>
+                  <li><Check />3 recipe generations a month</li>
+                  <li><Check />Up to 10 saved recipes</li>
+                  <li><Check />1 household profile</li>
+                  <li><Check />Pantry and allergen checks</li>
+                </ul>
+                <a className="btn btn-secondary" href={START_FREE}>Start free</a>
+              </article>
+
+              <article className="plan featured">
+                <div className="plan-top"><h3 className="plan-name">Plus</h3><span className="plan-flag">Recommended</span></div>
+                <div className="price"><b>£6</b><span>per month</span></div>
+                <p className="plan-note">For most households cooking through the week.</p>
+                <ul>
+                  <li><Check />100 recipe generations a month</li>
+                  <li><Check />Unlimited saved recipes</li>
+                  <li><Check />4 household profiles</li>
+                  <li><Check />Weekly planning</li>
+                </ul>
+                <a className="btn btn-primary" href={START_FREE}>Start free</a>
+              </article>
+
+              <article className="plan">
+                <div className="plan-top"><h3 className="plan-name">Family</h3></div>
+                <div className="price"><b>£11</b><span>per month</span></div>
+                <p className="plan-note">For busy kitchens with more than one set of tastes.</p>
+                <ul>
+                  <li><Check />300 recipe generations a month</li>
+                  <li><Check />Unlimited saved recipes</li>
+                  <li><Check />8 household profiles</li>
+                  <li><Check />Shared pantry and weekly planning</li>
+                </ul>
+                <a className="btn btn-secondary" href={START_FREE}>Start free</a>
+              </article>
+            </div>
+            <p className="pricing-foot"><b>Placeholder pricing for a pre-launch product.</b> No payment is taken, and final prices will be confirmed before launch. Annual billing and local taxes are still to be decided.</p>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="section" id="faq" style={{ paddingTop: 0 }}>
+          <div className="wrap faq-wrap">
+            <div className="section-head center">
+              <p className="eyebrow">FAQ</p>
+              <h2>Good questions, plain answers.</h2>
+            </div>
+            <div className="faq-list">
+              <details className="faq-item">
+                <summary>I hate mushrooms. Is that a texture thing?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>Often, yes. A lot of “picky” dislikes are really about how a food feels — slimy, mushy, rubbery or watery. TasteChef lets you say that directly, so it can suggest a mushroom recipe with a crisp finish, or leave mushrooms out entirely.</p>
+                  <p>You can also mark a dislike as <b>“only when prepared like this”</b>, which means the ingredient stays on the table when the texture is right.</p>
+                </div>
+              </details>
+              <details className="faq-item">
+                <summary>How do you keep allergens safe?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>Allergens are checked by <b>deterministic code</b>, not by asking a language model to be careful. You list your allergens, and recipes are screened against that list before they reach you. A recipe that cannot be checked is not shown as safe.</p>
+                  <p>No software can guarantee an allergen-free kitchen. Always check packaging and labels, and consider cross-contact at home. TasteChef gives general cooking information and is <b>not medical advice</b>.</p>
+                </div>
+              </details>
+              <details className="faq-item">
+                <summary>Where do the recipes and nutrition numbers come from?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>Recipes are generated for your profile and drawn from a seed library built with TheMealDB. Nutrition is calculated per serving from <b>USDA FoodData Central</b> values.</p>
+                  <p>Numbers are estimates. Cooking method, portion size and ingredient brands all change the result, so treat them as a guide rather than a measurement.</p>
+                </div>
+              </details>
+              <details className="faq-item">
+                <summary>Can I use it with only what is already in my pantry?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>Yes. <b>Pantry-only mode</b> returns recipes you can cook without shopping. If you would rather allow one or two missing items, you can relax the rule and TasteChef will tell you exactly what is missing before you start.</p>
+                </div>
+              </details>
+              <details className="faq-item">
+                <summary>Do you support vegetarian, halal, keto and other diets?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>TasteChef supports diet goals including vegetarian, vegan, pescatarian, halal-style, keto and low-carb, alongside allergies and texture preferences.</p>
+                  <p>A diet filter is not a religious or medical certification. For halal, kosher or medically prescribed diets, check ingredients and preparation yourself, and speak to a qualified professional where needed.</p>
+                </div>
+              </details>
+              <details className="faq-item">
+                <summary>What happens to my taste profile and pantry data?<span className="faq-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M10 4v12M4 10h12" /></svg></span></summary>
+                <div className="faq-body">
+                  <p>Your taste profile, pantry and saved recipes are stored with your account so they are there next time. They are used to generate your recipes, not sold to advertisers. You can delete your account and its data from settings.</p>
+                  <p>The full privacy policy will be published before launch. Pre-launch, this page is a preview and no account data is being collected.</p>
+                </div>
+              </details>
+            </div>
+            <p className="faq-aside">Still curious? <a href={EMAIL}>Email the team</a> and we will answer.</p>
+          </div>
+        </section>
+
+        {/* CLOSING */}
+        <section className="closing">
+          <div className="wrap closing-grid">
+            <div>
+              <h2>Eat what you like. Skip what you don’t.</h2>
+              <p>Your next dinner can start with the food already in your kitchen.</p>
+            </div>
+            <div className="closing-actions">
+              <a className="btn btn-white" href={START_FREE}>Start free <Arrow /></a>
+              <a className="btn btn-ghost-white" href="#how">See how it works</a>
+              <p className="closing-fine">No credit card. Pre-launch preview.</p>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section className="section" id="stories">
-      <div className="tc-container">
-        <div className="section-head">
-          <div className="eyebrow"><span className="bar"></span>Early testers</div>
-          <h2>People who cook <span className="nowrap">with it</span></h2>
-        </div>
-        <div className="quotes">
-          <div className="quote-feature">
-            <div className="author">
-              <span className="avatar" aria-hidden="true">
-                <svg viewBox="0 0 48 48"><defs><pattern id="dots-a" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#1e40af" opacity=".5"/></pattern></defs><rect width="48" height="48" fill="#f2f1ec"/><circle cx="24" cy="20" r="10" fill="#fbfaf4" stroke="#141314" strokeWidth="1.4"/><path d="M13 47c1-9 5-13 11-13s10 4 11 13" fill="#1e40af"/><path d="M14 20c0-7 4.5-11 10-11s10 4 10 11c-2-3-5-5-10-5s-8 2-10 5Z" fill="#141314"/><rect x="24" y="11" width="14" height="19" fill="url(#dots-a)"/><circle cx="20.5" cy="20" r="1" fill="#141314"/><circle cx="27.5" cy="20" r="1" fill="#141314"/><path d="M21.5 24.5c1.6 1.2 3.4 1.2 5 0" fill="none" stroke="#141314" strokeWidth="1.1" strokeLinecap="round"/></svg>
-              </span>
-              <div><div className="author-name">Maya R.</div><div className="author-role">Cooks for two, Bristol</div></div>
+      </main>
+
+      <footer>
+        <div className="wrap">
+          <div className="footer-top">
+            <div className="footer-brand">
+              <a className="brand" href="#top" aria-label="TasteChef home">
+                <span className="brand-mark"><Bowl /></span>
+                TasteChef
+              </a>
+              <p>Recipes for the way you actually eat. Built around your textures, your allergens and your kitchen.</p>
+              <div className="socials">
+                <a href={GITHUB} target="_blank" rel="noreferrer">GitHub</a>
+                <a href={EMAIL}>Email</a>
+                <a href={`${EMAIL}?subject=Press%20enquiry`}>Press</a>
+              </div>
             </div>
-            <p className="quote">I stopped opening five tabs to work out dinner. It read my pantry and gave me something I actually wanted to eat.</p>
-          </div>
-          <div className="quote-pair">
-            <div className="quote-cell">
-            <div className="author">
-              <span className="avatar" aria-hidden="true">
-                <svg viewBox="0 0 48 48"><defs><pattern id="dots-b" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#1e40af" opacity=".5"/></pattern></defs><rect width="48" height="48" fill="#f2f1ec"/><circle cx="24" cy="20" r="10" fill="#fbfaf4" stroke="#141314" strokeWidth="1.4"/><path d="M13 47c1-9 5-13 11-13s10 4 11 13" fill="#141314"/><path d="M14 21c-1-8 4-12 10-12 7 0 11 4 10 12-1-2-3-4-5-4-2 2-7 3-10 2-2 1-4 1-5 2Z" fill="#141314"/><rect x="10" y="12" width="13" height="16" fill="url(#dots-b)"/><circle cx="20.5" cy="20" r="1" fill="#141314"/><circle cx="27.5" cy="20" r="1" fill="#141314"/><path d="M21.5 24.5c1.6 1.2 3.4 1.2 5 0" fill="none" stroke="#141314" strokeWidth="1.1" strokeLinecap="round"/></svg>
-              </span>
-              <div><div className="author-name">Daniel O.</div><div className="author-role">Home cook, Chicago</div></div>
+            <div className="footer-col">
+              <h3>Product</h3>
+              <ul>
+                <li><a href="#how">How it works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href={APK} download>Download the app</a></li>
+              </ul>
             </div>
-            <p className="quote">The texture settings are the first ones that made sense. No more slimy mushrooms hiding in a sauce.</p>
-          </div>
-            <div className="quote-cell">
-            <div className="author">
-              <span className="avatar" aria-hidden="true">
-                <svg viewBox="0 0 48 48"><defs><pattern id="dots-c" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#1e40af" opacity=".5"/></pattern></defs><rect width="48" height="48" fill="#f2f1ec"/><circle cx="24" cy="20" r="10" fill="#fbfaf4" stroke="#141314" strokeWidth="1.4"/><path d="M13 47c1-9 5-13 11-13s10 4 11 13" fill="#1e40af"/><path d="M13 22c0-9 5-13 11-13s11 4 11 13c0-3-2-6-4-7-3 2-11 2-14 0-2 1-4 4-4 7Z" fill="#141314"/><rect x="24" y="10" width="14" height="20" fill="url(#dots-c)"/><circle cx="20.5" cy="20" r="1" fill="#141314"/><circle cx="27.5" cy="20" r="1" fill="#141314"/><path d="M21.5 24.5c1.6 1.2 3.4 1.2 5 0" fill="none" stroke="#141314" strokeWidth="1.1" strokeLinecap="round"/></svg>
-              </span>
-              <div><div className="author-name">Priya S.</div><div className="author-role">Commuter, Toronto</div></div>
+            <div className="footer-col">
+              <h3>Company</h3>
+              <ul>
+                <li><a href="#top">About</a></li>
+                <li><a href={EMAIL}>Contact</a></li>
+                <li><a href={`${EMAIL}?subject=Press%20enquiry`}>Press kit</a></li>
+                <li><a href={GITHUB} target="_blank" rel="noreferrer">GitHub</a></li>
+              </ul>
             </div>
-            <p className="quote">It works on the train with no bars. That’s the whole review.</p>
+            <div className="footer-col">
+              <h3>Legal</h3>
+              <ul>
+                <li><a href="#faq">Privacy policy</a></li>
+                <li><a href="#faq">Terms of use</a></li>
+                <li><a href="#faq">Allergen disclaimer</a></li>
+                <li><a href="#faq">Cookie settings</a></li>
+              </ul>
+            </div>
           </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section className="section" id="download">
-      <div className="tc-container">
-        <div className="section-head">
-          <div className="eyebrow"><span className="bar"></span>Get it</div>
-          <h2>Take it into the kitchen</h2>
-          <p className="lead">Start on the web in seconds. Sideload the Android build, or keep it on your home screen like any other app.</p>
-        </div>
-        <div className="download-grid">
-          <div className="platform">
-            <span className="p-flag">Sideload</span>
-            <span className="platform-icon"><svg aria-hidden="true"><use href="#i-phone"/></svg></span>
-            <div className="p-head"><h3>Android</h3><p className="meta">Debug APK · 5.4 MB · v0.1.0</p></div>
-            <a className="btn btn-primary" href="/downloads/tastechef-debug.apk" download>Download APK <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <div className="install-line"><b>Install</b><code>adb install tastechef-debug.apk</code></div>
-          </div>
-          <div className="platform">
-            <span className="platform-icon"><svg aria-hidden="true"><use href="#i-tablet"/></svg></span>
-            <div className="p-head"><h3>iPhone &amp; iPad</h3><p className="meta">Install from Safari in two taps.</p></div>
-            <a className="btn btn-secondary" href="/app/generate">Open web app <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <div className="install-line"><b>Install</b><span>Share → Add to Home Screen</span></div>
-          </div>
-          <div className="platform">
-            <span className="platform-icon"><svg aria-hidden="true"><use href="#i-monitor"/></svg></span>
-            <div className="p-head"><h3>Desktop</h3><p className="meta">Any modern browser. No account needed.</p></div>
-            <a className="btn btn-secondary" href="/app/generate">Open in browser <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <div className="install-line"><b>No install</b><span>Open and cook.</span></div>
+          <div className="footer-bottom">
+            <p className="disclaimer">TasteChef gives general cooking and nutrition information and is not medical advice.</p>
+            <p className="copy">© 2026 TasteChef. All rights reserved.</p>
           </div>
         </div>
-        <p className="download-note">The Android build is a debug APK, signed with a local key. It’s for trying, not for the Play Store.</p>
-      </div>
-    </section>
-
-    <section className="section" id="faq">
-      <div className="tc-container">
-        <div className="section-head">
-          <div className="eyebrow"><span className="bar"></span>Good questions</div>
-          <h2>The short answers</h2>
-        </div>
-        <div className="faq-grid">
-          <div className="faq-item"><h3>Is TasteChef free?</h3><p>Yes. The web app and the offline engine are free to use. There’s no account, no trial and no paywall hiding the recipe button.</p></div>
-          <div className="faq-item"><h3>Does it really work offline?</h3><p>Yes. The distilled recipe engine ships with the app, so generation runs on your device. You can turn off wifi and keep cooking.</p></div>
-          <div className="faq-item"><h3>How does it learn my taste?</h3><p>Every rating updates a small on-device model. Any hard rule you set — no slimy textures, no mushrooms, no dairy — is applied before a recipe is shown.</p></div>
-          <div className="faq-item"><h3>Can it handle allergies?</h3><p>It checks every ingredient against nine common allergen groups, including milk, eggs, peanuts, tree nuts, wheat, soy, fish, shellfish and sesame. It is a filter, not medical advice; always check labels.</p></div>
-          <div className="faq-item"><h3>Do I need an account?</h3><p>No. The demo opens straight into the kitchen. If you sign in, your pantry and taste profile can follow you between devices.</p></div>
-          <div className="faq-item"><h3>Where do the recipes come from?</h3><p>Fifty-two curated templates, each with ingredient-level nutrition and substitutions. The engine adapts them to your pantry instead of inventing dishes from scratch.</p></div>
-        </div>
-      </div>
-    </section>
-
-    </main>
-
-    <footer className="section footer" id="footer">
-      <div className="tc-container">
-        <div className="footer-links">
-          <div className="footer-col"><h4>Product</h4><a href="#features">Features</a><a href="#taste">Taste</a><a href="#offline">Offline</a><a href="#download">Download</a></div>
-          <div className="footer-col"><h4>Company</h4><a href="#top">About</a><a href="#stories">Journal</a><a href="mailto:hello@tastechef.app">Contact</a></div>
-          <div className="footer-col"><h4>Help</h4><a href="#faq">FAQ</a><a href="#faq">Privacy</a><a href="#faq">Terms</a></div>
-        </div>
-        <span className="giant" aria-hidden="true">TasteChef</span>
-        <div className="footer-base">
-          <span className="copy">© 2026 TasteChef</span>
-          <div className="socials">
-            <a href="https://instagram.com" aria-label="TasteChef on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg>Instagram</a>
-            <a href="https://youtube.com" aria-label="TasteChef on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg>YouTube</a>
-            <a href="https://github.com" aria-label="TasteChef on GitHub"><svg aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
-          </div>
-        </div>
-        <p className="footer-note">Nutrition is estimated, not medical advice. Android builds are debug APKs signed locally.</p>
-      </div>
-    </footer>
-  </div>
-</div>
-    </>
+      </footer>
+    </div>
   );
 }
